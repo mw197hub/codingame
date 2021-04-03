@@ -46,7 +46,7 @@ def bildeGraph(feldList):
 
 
 
-def schritte(x,y,posV,feldList,felder,schrittList,graph,moveList, ziel):
+def schritte(x,y,posV,feldList,felder,schrittList,graph,moveList, ziel,mod):
     if posV == "RIGHT":
         posV = "LEFT"
     elif posV == "LEFT":
@@ -55,7 +55,7 @@ def schritte(x,y,posV,feldList,felder,schrittList,graph,moveList, ziel):
     feld = str(x)+"-"+str(y)
   #  print(feld,file=sys.stderr)
     schrittList.append(feld)
-    if feld == ziel:
+    if feld in ziel:
         moveList.append(schrittList[:])
         return
    # felder.remove(feld)
@@ -68,33 +68,37 @@ def schritte(x,y,posV,feldList,felder,schrittList,graph,moveList, ziel):
                 typ = int(feldList[abs(int(y))][abs(int(x))])
                 pRichtung = direktList[abs(typ)]
                 if posV in pRichtung and pRichtung[posV] == posN:
-                    schritte(x1,y1,posN,feldList,felder,schrittList,graph,moveList,ziel)
+                    schritte(x1,y1,posN,feldList,felder,schrittList,graph,moveList,ziel,mod)
                     schrittList.pop()
                 else:
           #  print(mNew,file=sys.stderr)
                     gesetzt = False
-                    if typ > 0:
+                    if typ > 0 and mod:
                         rWert = rotateList[abs(typ)]                                    
                         bewegList = []
-                        if 'L' in rWert:
-                            gesetzt, bewegList = richtungDrehen('L',rWert,posV,posN,direktList,bewegList,typ,[abs(int(y1)),abs(int(x1))])                
-                        if 'R' in rWert and not gesetzt:
-                            gesetzt, bewegList = richtungDrehen('R',rWert,posV,posN,direktList,bewegList,typ,[abs(int(y1)),abs(int(x1))]) 
+                        if 'R' in rWert:
+                            gesetzt, bewegList = richtungDrehen('R',rWert,posV,posN,direktList,bewegList,typ,[abs(int(y1)),abs(int(x1))])                
+                        if 'L' in rWert and not gesetzt:
+                            gesetzt, bewegList = richtungDrehen('L',rWert,posV,posN,direktList,bewegList,typ,[abs(int(y1)),abs(int(x1))]) 
                     if gesetzt:
-                        schritte(x1,y1,posN,feldList,felder,schrittList,graph,moveList,ziel)
+                        schritte(x1,y1,posN,feldList,felder,schrittList,graph,moveList,ziel,mod)
                         schrittList.pop()
                 
     else:
         schrittList.clear()
         return
 
-def sucheWeg(inputs,feldList,felder,graph,ziel):
+def sucheWeg(inputs,feldList,felder,graph,ziel,mod):
     moveList = []
     xStart = int(inputs[0])
     yStart = int(inputs[1])
     pos = inputs[2]
+    if pos == "RIGHT":
+        pos = "LEFT"
+    elif pos == "LEFT":
+        pos = "RIGHT"
     schrittList = []
-    schritte(xStart,yStart,pos,feldList,felder,schrittList,graph,moveList,ziel)
+    schritte(xStart,yStart,pos,feldList,felder,schrittList,graph,moveList,ziel,mod)
     return moveList
 
 def richtungDrehen(art,rWert,posAlt,posNew,direktList,bewegList,typ,mNew):
@@ -156,11 +160,11 @@ def pruefeWeg(moveL,typeList,rotateList,inputs):
             rWert = rotateList[abs(typ)]            
             # links versuchen
             gesetzt = False
-            if 'L' in rWert:
-                gesetzt, bewegList = richtungDrehen('L',rWert,posAlt,posNew,direktList,bewegList,typ,mNew)                
+            if 'R' in rWert:
+                gesetzt, bewegList = richtungDrehen('R',rWert,posAlt,posNew,direktList,bewegList,typ,mNew)                
             # rechts versuchen
-            if 'R' in rWert and not gesetzt:
-                gesetzt, bewegList = richtungDrehen('R',rWert,posAlt,posNew,direktList,bewegList,typ,mNew) 
+            if 'L' in rWert and not gesetzt:
+                gesetzt, bewegList = richtungDrehen('L',rWert,posAlt,posNew,direktList,bewegList,typ,mNew) 
             if not gesetzt:
                 return False,[]
 
@@ -243,7 +247,7 @@ w,h = 13,10
 ex = 2
 inputs = ['0','0','TOP']
 '''
-
+'''
 feldList = [['0', '0', '0', '0', '0', '0', '0', '0', '-3', '0'], 
             ['0', '7', '-2', '3', '-2', '3', '-2', '3', '11', '0'],    
             ['0', '-7', '-2', '2', '2', '2', '2', '2', '2', '-2'], 
@@ -256,24 +260,28 @@ w,h = 10,8
 ex = 1
 inputs = ['8','0','TOP']
 '''
+
 feldList = [['0', '-3', '0', '-3', '0', '-3', '0', '-3', '-3', '0'], 
-            ['0', '7', '-2', '3', '-2', '2', '-2', '3', '11', '0'], 
+            ['0', '7', '-2', '2', '-2', '2', '-2', '2', '10', '0'], 
+            ['0', '-7', '-2', '-2', '-2', '-2', '3', '-2', '2', '-2'], 
+            ['0', '9', '-2', '-2', '-2', '-2', '-2', '2', '-2', '-2'], 
             ['0', '-7', '-2', '-2', '-2', '-2', '2', '-2', '2', '-2'], 
-            ['0', '6', '-2', '-2', '-2', '-2', '-2', '2', '-2', '-2'], 
-            ['0', '-7', '-2', '-2', '-2', '-2', '2', '-2', '2', '-2'], 
-            ['0', '8', '-2', '-2', '-2', '-2', '-2', '2', '-2', '-2'], 
+            ['0', '7', '-2', '-2', '-2', '-2', '-2', '2', '-2', '-2'], 
             ['0', '-7', '-2', '-2', '-2', '-2', '2', '-2', '2', '-2'], 
             ['0', '-3', '0', '0', '0', '0', '0', '0', '0', '0']]
 w,h = 10,8
 ex = 1
 inputs = ['8','0','TOP']
-'''
+#inputs = ['8','1','TOP']
+
 
 graph, felder = bildeGraph(feldList)
 #print(graph,file=sys.stderr)
 #print("-----",file=sys.stderr)
 ziel = str(ex)+"-"+str(h - 1)
-moveList = sucheWeg(inputs,feldList,felder,graph,ziel)
+zielL = []
+zielL.append(ziel)
+moveList = sucheWeg(inputs,feldList,felder,graph,zielL,True)
 print("----- mögliche Wege ------",file=sys.stderr)
 print(len(moveList),file=sys.stderr)
 print(moveList,file=sys.stderr)
@@ -281,6 +289,7 @@ print("-----",file=sys.stderr)
 wegeList = []
 zaehler = 0
 ergList = []
+ergWeg = []
 anzahl = 999
 for moveL in sorted(moveList):
     zaehler += 1
@@ -288,12 +297,13 @@ for moveL in sorted(moveList):
     #print(moveL,file=sys.stderr)
     moeglich,bewegList = pruefeWeg(moveL,typeList,rotateList,inputs)
     if moeglich:
-        print(zaehler,file=sys.stderr)
-        print(moveL,file=sys.stderr)
+       # print(zaehler,file=sys.stderr)
+       # print(moveL,file=sys.stderr)
         wegeList.append(bewegList[:])
         if len(moveL) < anzahl:
             anzahl = len(moveL)
             ergList = bewegList[:]
+            ergWeg = moveL[:]
 
 print(ergList,file=sys.stderr)
 
@@ -305,7 +315,10 @@ richt = {'L':'LEFT','R':'RIGHT'}
 while True:
     if runde < len(ergList):
         erg = ergList[runde]
+        sum = int(inputs[0]) - erg[0] + int(inputs[1]) - erg[1]
+
         print(str(erg[0]) + " " + str(erg[1]) + " " + richt[erg[2]])
+        feldList[erg[1]][erg[0]] = str(erg[4])
     else:
         print("WAIT")
 
@@ -314,5 +327,33 @@ while True:
     runde += 1
 
 
+rocks = ['5','5','RIGHT']
+moveList = sucheWeg(rocks,feldList,felder,graph,ergWeg,False)
+if len(moveList) > 0:
+    moveL = moveList[0]
+    saveL = moveL[:]
+    if len(moveL) > 2:
+        drehF = moveL.pop()    
+        while True:
+            drehF = getMoveDaten(moveL.pop())
+            if int(feldList[drehF[1]][drehF[0]]) > 0:
+                print(drehF)
+                break
+            if len(moveL) == 0:                                
+                while saveL:
+                    drehF = getMoveDaten(saveL.pop())
+                    typF = int(feldList[drehF[1]][drehF[0]])
+                    if typF > 0 and typF in [6,7,8,9]:
+                        print("doppelDreh",file=sys.stderr)
+                break
 
-    [['0', '0', '0', '0', '0', '0', '-3', '0', '0', '0', '0', '0', '0'], ['0', '0', '0', '8', '3', '3', '5', '2', '2', '8', '2', '3', '13'], ['0', '0', '11', '5', '13', '0', '3', '0', '0', '3', '0', '0', '2'], ['0', '10', '10', '0', '3', '0', '2', '0', '11', '4', '10', '0', '2'], ['0', '3', '0', '0', '2', '0', '2', '0', '2', '0', '3', '0', '3'], ['0', '2', '0', '12', '10', '10', '1', '2', '10', '0', '3', '12', '10'], ['12', '6', '0', '2', '0', '3', '2', '12', '3', '3', '10', '4', '-13'], ['11', '-1', '2', '-6', '2', '-6', '6', '-6', '2', '3', '2', '-6', '-10']]
+
+
+[['0', '-3', '0', '-3', '0', '-3', '0', '-3', '-3', '0'], 
+['0', '7', '-2', '3', '-2', '2', '-2', '3', '11', '0'], 
+['0', '-7', '-2', '-2', '-2', '-2', '2', '-2', '2', '-2'], 
+['0', '6', '-2', '-2', '-2', '-2', '-2', '2', '-2', '-2'],
+ ['0', '-7', '-2', '-2', '-2', '-2', '2', '-2', '2', '-2'],
+  ['0', '8', '-2', '-2', '-2', '-2', '-2', '2', '-2', '-2'],
+   ['0', '-7', '-2', '-2', '-2', '-2', '2', '-2', '2', '-2'],
+    ['0', '-3', '0', '0', '0', '0', '0', '0', '0', '0']]
