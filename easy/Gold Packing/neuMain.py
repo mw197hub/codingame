@@ -38,12 +38,14 @@ def process(m,bars):
         #print(barSet,file=sys.stderr)
         if sum(barSet) <= m:
             validLengths.append([sum(barSet),len(barSet),i,barSet])
-    #print(sorted(validLengths),file=sys.stderr)
+  #  print(sorted(validLengths),file=sys.stderr)
     newErg = []
     newErg.append(sorted(validLengths).pop())
     for e in sorted(validLengths):
         if e[0] == newErg[0][0]:
             newErg.append(e)
+    newErg.pop(0)
+    print(newErg,file=sys.stderr)
     newErg1 = []
     laenge = 99
     for e in newErg:
@@ -71,13 +73,13 @@ n = 19
 # 3 6 10 21 28 45 55 66 78 91 105 120 136 153 171 190 210
 barList = [3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78, 91, 105, 120, 136, 153, 171, 190, 210]
 
-m = 113
-n = 10
-barList = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+#m = 113
+#n = 10
+#barList = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 
-m = 46
-n = 7
-barList = [1, 3, 5, 7, 9, 11, 13]
+#m = 46 #46
+#n = 7
+#barList = [1, 3, 5, 7, 9, 11, 13]
 
 #m = 6
 #n = 3
