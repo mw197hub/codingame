@@ -16,7 +16,6 @@ datei = "C:\\Users\\wiedm\\Python\\codingame\\easy\\if then else\\input4.txt"
 befehle = ["if","else","endif","end"]
 inputList = []
 ergList = []
-ebene = 0
 ergStr = ""
 f = open(datei, "r")
 for x in f:
