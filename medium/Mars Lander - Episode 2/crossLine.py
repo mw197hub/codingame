@@ -19,17 +19,12 @@ def is_between(p1,p2,p3):
     return distance(p1,p3) + distance(p3,p2) == distance(p1,p2)
 
 def GetLinePara(line):
-    line.a = line.p1.y - line.p2.y
-    line.b = line.p2.x - line.p1.x
+    line.a = line.p1.y - line.p2.y; line.b = line.p2.x - line.p1.x
     line.c = line.p1.x * line.p2.y - line.p2.x * line.p1.y
  
- 
 def GetCrossPoint(l1,l2):
-    GetLinePara(l1)
-    GetLinePara(l2)
-    d = l1.a * l2.b - l2.a * l1.b
-    #print(d)
-    p = Point()
+    GetLinePara(l1);  GetLinePara(l2)
+    d = l1.a * l2.b - l2.a * l1.b; p = Point()
     p.x = (l1.b * l2.c - l2.b * l1.c)*1.0 / d
     p.y = (l1.c * l2.a - l2.c * l1.a)*1.0 / d
     return is_between(l2.p1,l2.p2,p), p

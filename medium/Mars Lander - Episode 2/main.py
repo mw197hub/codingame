@@ -1,64 +1,88 @@
 import sys
 import math
 
-grafity = -3.711
 
-class Point():
-    x,y = 0,0
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
+landList = []
+x,hSpeed,vSpeed,outputAngle,outputThrust = 0,0,0,0,0
+flat = [0,0,0]
 
-def update(ship,vec, rotate,power, fuel, inRotate, inPower):
-   # grafity = 3.711
-    deltaRotate = inRotate - rotate
-    if deltaRotate > 15:
-        rotate += 15
-    elif deltaRotate < -15:
-        rotate -= 15
+maxHorizontalSpeed = 100
+desiredSpeedWhenNear = 20
+farDistance = 2000
+distanceX, isFar, isOverLandingArea  = 0,0,0
+desiredDirection, currentDirection,isMovingToDesiredDirection,isMovingUp  = 0,0,0,0
+desiredInitialSpeed = 0
+
+def getDistanceX():
+    return abs(flat[1] - x)
+def getIsFar():
+    print(str(distanceX),file=sys.stderr)
+    if distanceX > farDistance:
+        return True
+    return False
+def getIsOverLandingArea():
+    if x >= flat[0] and x <= flat[2]:
+        return True
+    return False
+def getSign(wert1):
+    if wert1 == 0:
+        return 0
+    elif wert1 > 0:
+        return 1
+    return -1
+def getIsMovingToDesiredDirection():
+    if desiredDirection == currentDirection:
+        return True
+    return False
+def getIsMovingUp():
+    if vSpeed > 0:
+        return True
+    return False 
+def GetDesiredAngle(desiredSpeedX,maxAngle):
+    desiredVelocity = desiredSpeedX * desiredDirection
+    desiredAcceleration = desiredVelocity - hSpeed
+    return -max(-maxAngle, min(maxAngle, desiredAcceleration * 2))
+
+n = int(input())  
+for i in range(n):
+    land_x, land_y = [int(j) for j in input().split()]
+    landList.append([land_x,land_y])
+
+for i in range(len(landList)-1):
+        if landList[i][1] == landList[i+1][1]:
+            flat[0] = landList[i][0]
+            flat[2] = landList[i+1][0]
+            flat[1] = (flat[0] + flat[2]) / 2
+runde = 0
+while True:
+    x, y, hSpeed, vSpeed, f, r, p = [int(i) for i in input().split()]
+    distanceX = getDistanceX()
+    isFar = getIsFar()
+    isOverLandingArea = getIsOverLandingArea()
+    desiredDirection = getSign(flat[1] - x)
+    currentDirection = getSign(hSpeed)
+    isMovingToDesiredDirection = getIsMovingToDesiredDirection()
+    isMovingUp = getIsMovingUp()
+    
+    if runde == 0:
+        if isMovingToDesiredDirection:
+            desiredInitialSpeed = abs(hSpeed)
+        else:
+            desiredInitialSpeed = maxHorizontalSpeed
+        print("0 0")
     else:
-        rotate = inRotate
-
-    if fuel < inPower:
-        inPower = fuel
-    deltaPower = power - inPower
-    if deltaPower < -1:
-        power += 1
-    elif deltaPower > 1:
-        power -=1
-    else:
-        power = inPower
-    fuel = fuel - power
-
-    fRotation = -rotate / 180 * math.pi
-    powerX = power * math.sin(fRotation)
-    powerY = power * math.cos(fRotation)
-    bewegung = Point(0,0)
-    bewegung.x = powerX
-    bewegung.y = grafity + int(powerY)
-    vec.x = round(vec.x + bewegung.x)
-    vec.y = round(vec.y + bewegung.y)
-    ship.x += vec.x
-    ship.y += vec.y
-
-    return ship,fuel,rotate,vec,power
-
-ziel = Point(1000,2100)
-vec = Point(-50,0)
-ship = Point(6500,2700)
-rotate = 90
-power = 0
-fuel = 1000
-inRotate = -5
-inPower = 4
-
-for i in range(6):
-    inRotate = -5
-    inPower = 4
-    ship, fuel, rotate, vec, power= update(ship,vec, rotate,power, fuel, inRotate, inPower)
-
-print("ship: " + str(ship.x) + " - " + str(ship.y))
-print("Bewegung hs: " + str(vec.x) + "  vs: " + str(vec.y))
-print(fuel)
-print(rotate)
-print(power)
+        outputThrust = 4
+        if isOverLandingArea:
+            if abs(vSpeed) < 40 and hSpeed == 0:
+                outputThrust = 3
+            outputAngle = GetDesiredAngle(0,33)
+        else:
+            if isMovingUp:
+                outputThrust = 3
+            if isFar:
+                outputAngle = GetDesiredAngle(desiredInitialSpeed,61)
+            else:
+                outputAngle = GetDesiredAngle(desiredSpeedWhenNear,45)
+        print(str(outputAngle)+" " + str(outputThrust))
+    print(str(isFar) + " - " + str(isOverLandingArea) + " - " + str(isMovingToDesiredDirection),file=sys.stderr)
+    runde += 1

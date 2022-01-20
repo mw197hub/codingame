@@ -1,6 +1,16 @@
 visited = [] # List to keep track of visited nodes.
 queue = []     #Initialize a queue
 
+def bfsMitWege(wege, queue, visited, graph, node):
+    if node not in visited:
+      #  print(node)
+        visited.append(node)
+        for neighbour in graph[node]:
+            bfs(wege, queue, visited,graph,neighbour)
+        wege.append(visited[:])
+        visited.pop()
+
+
 def bfs(visited, graph, node):
   visited.append(node)
   queue.append(node)
@@ -151,6 +161,9 @@ print(' ')
 print('--------------------------------------------------------------------------\n')
 ergebnis = bfs_shortest_path(graph2, '1-1', '8-8')
 print(ergebnis)
+
+wege = []; visited = []; queue = []
+bfs(wege, queue, visited, graph, '1-1'
 
 move = ""
 start = str(1) + "-" + str(1)
