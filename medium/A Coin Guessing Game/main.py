@@ -50,6 +50,7 @@ while True:
             for c1,gL1 in coinList.items():
                 if len(gL1) > 1 and dWert in gL1:
                     gL1.remove(dWert)
+                    abbruch = False
     if abbruch:
         break
 
