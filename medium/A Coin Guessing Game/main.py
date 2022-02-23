@@ -53,9 +53,6 @@ while True:
     if abbruch:
         break
 
-
-
-
 for zahl in sorted(coinList):
     wert = coinList[zahl]
     erg = erg + str(wert[0]) + " "
