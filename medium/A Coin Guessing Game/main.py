@@ -11,12 +11,14 @@ geradeList = []
 coinList = {}
 inputList = []
 erg = ""
+
 #n, t = [int(i) for i in input().split()]
 #for i in range(t):
-#    inputList.append(list(input().split()))
+#    inputList.append(list(int(i) for i in input().split()))
 #print(inputList,file=sys.stderr)
-n = 2;inputList = [['4', '2'], ['2', '4'], ['4', '3']]
-n = 3;inputList = [['3', '1', '6'], ['4', '1', '6']]
+
+n = 2;inputList = [[4, 2], [2, 4], [4, 3]]
+n = 3;inputList = [[3, 1, 6], [4, 1, 6]]
 
 for i in range(1,n*2 + 1,2):
     geradeList.append(i+1)
@@ -26,20 +28,15 @@ for i in range(1,n*2 + 1,2):
 for iList in inputList:
     unList = [];geList = []
     for zahl in iList:
-        if (istUngerade(int(zahl))):
+        if (istUngerade(zahl)):
             unList.append(zahl)
         else:
             geList.append(zahl)
     for uZahl in unList:
-        cList = coinList[int(uZahl)]
+        cList = coinList[uZahl]
         for gZahl in geList:
-            if int(gZahl) in cList:
-                cList.remove(int(gZahl))
-        if len(cList) == 1:
-            dWert = cList[0]
-            for c,gL in coinList.items():
-                if len(gL) > 1 and dWert in gL:
-                    gL.remove(dWert)
+            if gZahl in cList:
+                cList.remove(gZahl)
 
 print(coinList,file=sys.stderr)
 while True:
@@ -53,6 +50,7 @@ while True:
                     abbruch = False
     if abbruch:
         break
+
 
 for zahl in sorted(coinList):
     wert = coinList[zahl]
