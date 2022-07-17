@@ -16,7 +16,7 @@ def suche(feldList,i,j,anzahl,tiefe,n):
 
 h = 5; n = 5; feldList = [[8, 9, 9, 8, 7], [8, 2, 3, 2, 7], [6, 4, 5, 4, 8], [9, 8, 4, 2, 7], [7, 8, 9, 6, 5]] #2
 #suchList = [[0 for i in range(n)] for i in range(n)]
-anzahl=0;tiefe=h+1
+anzahl=0;tiefe=0
 erg = 0
 
 for i in range(n):
