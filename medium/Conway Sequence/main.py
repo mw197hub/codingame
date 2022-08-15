@@ -28,4 +28,4 @@ erg = ""
 for e in ergList:
     erg = erg + str(e) + " "
 print(erg[:-1])
-print(*ergList)
+print(*ergList)  # einfacher
