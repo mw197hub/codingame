@@ -8,7 +8,7 @@ aList=[[9, 5],[1, 0]]
 
 abcList = string.ascii_lowercase
 search = [[1,0],[-1,0],[0,1],[0,-1]]
-ergList=[];pos=1
+ergList=[]
 for start in aList:
     treffer = False
     ergList=[];ergList.append(start)
