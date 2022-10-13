@@ -30,11 +30,3 @@ for row in sorted(abcDict):
     gerade = False if gerade else True
 
 print(erg[:-1])
-
-
-    #wert = 100-c if r%2 else c
-    #if r%2:
-    #    wert=100-c
-    #else:
-    #    wert=c
-    #abcDict[r*100+wert] = aList[0]
