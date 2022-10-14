@@ -11,5 +11,4 @@ for i in range(len(aList)):
         if (j-i)*mini > wert:
             wert=(j-i)*mini
         
-
 print(wert)
