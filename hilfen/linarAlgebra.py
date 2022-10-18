@@ -47,13 +47,14 @@ def is_inside_polygon(pList,p):
 # point in polygon  mit matplotlib
 p = path.Path([[0, 0], [100, 0], [150, 50], [100, 100], [0, 100]]) 
 result = p.contains_points([(125, 76)])
-print(result)
+#print(result)
 
 # punkt auf Linie
-print(is_between([0,0],[100,100],[1,1]))
+#print(is_between([0,0],[100,100],[1,1]))
 
-print("-----")
+#print("-----")
 # entfernung von punkten
 pList = [[0, 0], [100, 0], [150, 50], [100, 100], [0, 100]]
 p = [150,0]
-print(is_inside_polygon(pList,p))
+#print(is_inside_polygon(pList,p))
+print(distance([73,17],[60,99]))
