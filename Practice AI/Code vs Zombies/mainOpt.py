@@ -42,89 +42,62 @@ def gehe(p1,p2,move):
     return p1
 
 
-class SimpleEquation(Chromosome):
-    def __init__(self, ash,humanList,zombieList,moveLen) -> None:
-        self.ash=ash;self.punkte=0.0;self.moveLen=moveLen
-        self.moveList=[]  
-        self.humanList=humanList
-        self.zombieList=zombieList      
-        x = ash.x;y=ash.y;xSum=0;ySum=0
-        for i in range(moveLen):
-            newX=randrange(1000);newY=randrange(1000)
-            if randrange(2)==0:
-                newX=newX*-1
-            if randrange(2)==0:
-                newY=newY*-1
-            x = newX;y=newY
-            if x < 0:
-                x=x*-1
-            if x >=16000:
-                x=15999-(x-15999)
-            if y < 0:
-                y=y*-1
-            if y >=9000:
-                y=8999-(y-8999)
-            self.moveList.append(Point(x,y))
-            xSum+=x;ySum+=y        
-        self.fitness()
-     #   print(str(xSum/len(self.moveList))+" - " + str(ySum/len(self.moveList)),file=sys.stderr)
 
-    def fitness(self) -> float:         
-        fiboList = {0:0,1:1,2:2,3:3,4:5,5:8,6:13,7:21,8:34,9:55,10:89,11:144,12:233,13:377,14:610,15:987,16:1597,17:2584,18:4181,19:6765,20:10946}
-        self.punkte=0;zPunkte=0;hPunkte=0
-        zList=copy.deepcopy(self.zombieList)
-        hList=copy.deepcopy(self.humanList)
-        newAsh = copy.deepcopy(self.ash)
-        for move in self.moveList:
-            anzZombies=0;anzHuman=0
-            for idZ,zombie in zList.items():
-                if zombie[2] == 1:
-                    dist=16000;zielP=Point(0,0)
+def fitness(ash,zombieList,humanList,moveList) -> float:         
+    fiboList = {0:0,1:1,2:2,3:3,4:5,5:8,6:13,7:21,8:34,9:55,10:89,11:144,12:233,13:377,14:610,15:987,16:1597,17:2584,18:4181,19:6765,20:10946}
+    punkte=0;zPunkte=0;hPunkte=0
+    zList=copy.deepcopy(zombieList)
+    hList=copy.deepcopy(humanList)
+    newAsh = copy.deepcopy(ash)
+    for move in moveList:
+        anzZombies=0;anzHuman=0
+        for idZ,zombie in zList.items():
+            if zombie[2] == 1:
+                dist=16000;zielP=Point(0,0)
+                for idH,human in hList.items():
+                    if human[1] == 1:
+                        nD = distance(zombie[0],human[0])
+                        if nD < dist:
+                            dist=nD;zielP=copy.deepcopy(human[0])
+                zombie[0] = copy.deepcopy(gehe(zombie[0],zielP,400))
+
+        nacher = Point(newAsh.x+move.x,newAsh.y+move.y)
+        newAsh = gehe(newAsh,nacher,1000)
+            
+        kills=0
+        for idZ,zombie in zList.items():                
+            if zombie[2] == 1:
+                anzZombies+=1
+                distZ = distance(newAsh,zombie[0])
+                #   print(distZ)
+                zPunkte += distZ
+                if distZ <= 2000:
+                    zombie[2] = 0;kills+=1
+                    anzZombies-=1                    
+                else:
                     for idH,human in hList.items():
                         if human[1] == 1:
+                            anzHuman+=1
                             nD = distance(zombie[0],human[0])
-                            if nD < dist:
-                                dist=nD;zielP=copy.deepcopy(human[0])
-                    zombie[0] = copy.deepcopy(gehe(zombie[0],zielP,400))
-
-            nacher = Point(newAsh.x+move.x,newAsh.y+move.y)
-            newAsh = gehe(newAsh,nacher,1000)
-            
-            kills=0
-            for idZ,zombie in zList.items():                
-                if zombie[2] == 1:
-                    anzZombies+=1
-                    distZ = distance(newAsh,zombie[0])
-                 #   print(distZ)
-                    zPunkte += distZ
-                    if distZ <= 2000:
-                        zombie[2] = 0;kills+=1
-                        anzZombies-=1
-                    
-                    else:
-                        for idH,human in hList.items():
-                            if human[1] == 1:
-                                anzHuman+=1
-                                nD = distance(zombie[0],human[0])
-                                if nD <= 400:
-                                    human[1]=0;anzHuman-=1
-            for idH,human in hList.items():
-                if human[1] == 1:
-                    distH = distance(newAsh,human[0])
-                    hPunkte+=distH
-
-            self.punkte=self.punkte+(fiboList[kills]*10)
-            self.punkte = self.punkte 
-            if anzZombies == 0:
-                break
-            if anzHuman == 0:
-                self.punkte=0;break
+                            if nD <= 400:
+                                human[1]=0;anzHuman-=1
         anzH=0
         for idH,human in hList.items():
             if human[1] == 1:
                 anzH+=1
 
-        self.punkte = self.punkte + (1 - (zPunkte/10000000)) + (1 - (hPunkte/1000000)) +anzH
+        punkte=punkte+(fiboList[kills*anzH**2]*10)
+        punkte = punkte 
+        if anzZombies == 0:
+            break
+        if anzHuman == 0:
+            punkte=0;break
+    anzH=0
+    for idH,human in hList.items():
+        if human[1] == 1:
+            anzH+=1
+
+
      #   print("    ",end="")        
      #   print(self.moveList[0],end="")
      #   print("  -  ",end="")
@@ -133,60 +106,7 @@ class SimpleEquation(Chromosome):
      #   print(str(zPunkte),end="   ")
      #   print(str(self.punkte))
         
-        return self.punkte
-
-    @classmethod
-    def random_instance(self,ash,humanList,zombieList,moveLen) -> SimpleEquation:
-        return SimpleEquation(ash,humanList,zombieList,moveLen)
-
-    def crossover(self, other: SimpleEquation) -> Tuple[SimpleEquation, SimpleEquation]:
-        child1: SimpleEquation = copy.deepcopy(self)
-        child2: SimpleEquation = copy.deepcopy(other)
-        anz = len(child1.moveList) if len(child1.moveList) < len(child2.moveList) else len(child2.moveList)
-        xySwitch=False
-        for i in range(anz):
-            if xySwitch:
-                child1.moveList[i].x = other.moveList[i].x
-                child2.moveList[i].x = self.moveList[i].x
-            else:
-                child1.moveList[i].y = other.moveList[i].y
-                child2.moveList[i].y = self.moveList[i].y
-            xySwitch = not xySwitch
-        return child1, child2
-
-    def mutate(self) -> None:
-        for _ in range(5):
-            pos = randrange(self.moveLen)
-            move = self.moveList[pos]
-            wert = randrange(250)
-            if random() > 0.5: # mutate x
-                if random() > 0.5:
-                    move.x += wert
-                    if move.x > 15999:
-                        move.x=15999-(move.x-15999)
-                else:
-                    move.x -= wert
-                    if move.x < 0:
-                        move.x=move.x*-1
-            else: # otherwise mutate y
-                if random() > 0.5:
-                    move.y += wert
-                    if move.y > 8999:
-                        move.y= 8999-(move.y-8999)
-                else:
-                    move.y -= wert
-                    if move.y < 0:
-                        move.y = move.y*-1
-
-    def __str__(self) -> str:
-        #return f"X: {self.x} Y: {self.y} Fitness: {self.fitness()}"
-        erg=str(self.punkte)+ ":  "
-        for m in self.moveList:
-            erg = erg + str(m.x) + "-" + str(m.y) + ", "
-        return erg
-
-
-
+    return punkte
 
 def setYX(y,x):
     return str(y)+"-"+str(x)
@@ -203,32 +123,27 @@ def erstelleGraph():
 
 
 
-def testWeg(ash,humanList,zombieList):
-    p=0;ergL=[]
-    initial_population: List[SimpleEquation] = [SimpleEquation.random_instance(ash,humanList,zombieList,20) for _ in range(40)]  
-   # print(initial_population[0])  
-   # initial_population[0],initial_population[1] = initial_population[0].crossover(initial_population[1])
-   # initial_population[0].mutate()
-   # initial_population[0].fitness()
-   # print(initial_population[0])
-    maxPunkte=(fiboList[len(zombieList)]*10)
-    maxPunkte+= len(humanList)
-    ga: GeneticAlgorithm[SimpleEquation] = GeneticAlgorithm(initial_population=initial_population, threshold=maxPunkte, max_generations = 40, mutation_chance = 0.1, crossover_chance = 0.7)
-    result: SimpleEquation = ga.run()
-    print(result,file=sys.stderr)
+def erstelleWege(ash,humanList,zombieList):
+    ergL=[]
+    graph = erstelleGraph()
+    
 
-    return result.punkte,result.moveList
+    return ergL
 
 def sucheWege(ash,humanList,zombieList):
-    graph = erstelleGraph()
-    ergDict = {};ergList=[]
+    punkte=0
+    ergL=[];moveList=[]
     time_1 = time.time()
+    ergL = erstelleWege(ash,humanList,zombieList)
     #while time.time() - time_1 < 3.01:
-    #    p,ergL = testWeg(ash,humanList,zombieList)
-    #    ergDict[p] = copy.deepcopy(ergL)
-    p,ergL = testWeg(ash,humanList,zombieList)
+    #    mList=ergL.pop(0)
+    #    p2 = fitness(ash,zombieList,humanList,mList)
+    #    if p2 > punkte:
+    #        punkte=p2;moveList = copy.deepcopy(mList)
     
-    return ergL
+    p2 = fitness(ash,zombieList,humanList,ergL.pop(0))
+        
+    return moveList
 
 
 name= "C:\\Users\\marku\\Python\\codingame\\Practice AI\\Code vs Zombies\\"
