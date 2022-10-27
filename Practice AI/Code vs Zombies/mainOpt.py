@@ -121,13 +121,33 @@ def erstelleGraph():
     return graph
     
 
+def zombieAsh(startP,zielP,ash,dauer):
+    posZ=copy.deepcopy(startP)
+    for i in range(int(dauer)+1):
+        posZ = gehe(posZ,zielP,400)
+        dist = distance(ash,posZ)
+       # print(dist,file=sys.stderr)
+        if dist - ((i+1) *1000) < 2000:
+            return posZ,i+1
+    return Point(-1,-1),-1
 
 
 def erstelleWege(ash,humanList,zombieList):
     ergL=[]
     graph = erstelleGraph()
-    
 
+    for zId,zombie in zombieList.items():
+        dist=25000;zielP=0
+        for hId,human in humanList.items():
+            dist2 = distance(zombie[0],human[0])
+            if dist2 < dist:
+                dist = dist2; zielP=human[0]
+        zombie.append(zielP)
+        zombie.append(dist/400)
+        ashWo,ashWann = zombieAsh(zombie[0],zielP,ash,dist/400)
+        zombie.append(ashWo)
+        zombie.append(ashWann)
+    print(zombieList,file=sys.stderr)
     return ergL
 
 def sucheWege(ash,humanList,zombieList):
@@ -141,7 +161,7 @@ def sucheWege(ash,humanList,zombieList):
     #    if p2 > punkte:
     #        punkte=p2;moveList = copy.deepcopy(mList)
     
-    p2 = fitness(ash,zombieList,humanList,ergL.pop(0))
+   ## p2 = fitness(ash,zombieList,humanList,ergL.pop(0))
         
     return moveList
 
