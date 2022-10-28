@@ -135,7 +135,7 @@ def zombieAsh(startP,zielP,ash,dauer):
 def erstelleWege(ash,humanList,zombieList):
     ergL=[]
     graph = erstelleGraph()
-
+    zielHuman=Point(0,0);distA=-9999
     for zId,zombie in zombieList.items():
         dist=25000;zielP=0
         for hId,human in humanList.items():
@@ -143,11 +143,32 @@ def erstelleWege(ash,humanList,zombieList):
             if dist2 < dist:
                 dist = dist2; zielP=human[0]
         zombie.append(zielP)
-        zombie.append(dist/400)
-        ashWo,ashWann = zombieAsh(zombie[0],zielP,ash,dist/400)
-        zombie.append(ashWo)
+        zombie.append(int((dist/400)+0.99))
+        ashZiel,ashWann = zombieAsh(zombie[0],zielP,ash,dist/400)
+        zombie.append(ashZiel)
         zombie.append(ashWann)
-    print(zombieList,file=sys.stderr)
+        diffAsh = ashWann - int((dist/400)+0.99)
+        if diffAsh > distA and diffAsh <= 0 and not ashZiel.x == -1:
+            distA=diffAsh;zielHuman = copy.deepcopy(ashZiel)
+
+        print(zombie,file=sys.stderr)
+    print(zielHuman,file=sys.stderr)
+    nextHuman=Point(0,0);dist=25000
+    for hId,human in humanList.items():
+        dist2 = distance(zielHuman,human[0])
+        if dist2 < dist and dist2 > 2000:
+            dist = dist2; nextHuman=human[0]            
+   # print(dist,file=sys.stderr)
+   # print(nextHuman,file=sys.stderr)
+    ergP = zielHuman
+    if distA < 0:
+        factor = 1800 / dist  # 2000 klappt nicht
+        x = zielHuman.x + int((nextHuman.x - zielHuman.x ) * factor)
+        y = zielHuman.y + int((nextHuman.y - zielHuman.y) * factor)
+        ergP = Point(x,y)
+    
+    print(ergP,file=sys.stderr)
+    ergL.append(ergP)
     return ergL
 
 def sucheWege(ash,humanList,zombieList):
@@ -163,11 +184,11 @@ def sucheWege(ash,humanList,zombieList):
     
    ## p2 = fitness(ash,zombieList,humanList,ergL.pop(0))
         
-    return moveList
+    return ergL
 
 
 name= "C:\\Users\\marku\\Python\\codingame\\Practice AI\\Code vs Zombies\\"
-name += "test2.txt"
+name += "test13a.txt"
 datei = open(name,'r')
 
 humanList = {};zombieList={};ergList=[]
@@ -187,11 +208,11 @@ while True:
         ergList = sucheWege(Point(x,y),humanList,zombieList)
 
         ash=Point(x,y)
-        print(ash,end="   ")
+     #   print(ash,end="   ")
         for move in ergList:
             ash.x+=move.x;ash.y+=move.y
-            print(ash,end="   ")
-        print("")
+     #       print(ash,end="   ")
+     #   print("")
 
     break
     p = ergList.pop(0)
