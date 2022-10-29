@@ -148,7 +148,7 @@ def erstelleWege(ash,humanList,zombieList):
         zombie.append(ashZiel)
         zombie.append(ashWann)
         diffAsh = ashWann - int((dist/400)+0.99)
-        if diffAsh > distA and diffAsh <= 0 and not ashZiel.x == -1:
+        if (diffAsh > distA or ashWann < 3) and diffAsh <= 0 and not ashZiel.x == -1:
             distA=diffAsh;zielHuman = copy.deepcopy(ashZiel)
 
         print(zombie,file=sys.stderr)

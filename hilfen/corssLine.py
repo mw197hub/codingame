@@ -1,11 +1,11 @@
 import math
 
 class Point():
-    x = 0
-    y = 0
+    x,y = 0,0
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
+    def __repr__(self) -> str:return (str(self.x) + " # " + str(self.y))
  
 class Line():
     def __init__(self, p1, p2):
@@ -70,3 +70,13 @@ for i in range(1,len(landList)):
             print(landP1,end="  -  ")
             print(landP2)
     landP1 = landList[i]    
+
+zielP=Point(950,6000)
+startP=Point(8000,6100)
+dist = distance(startP,zielP)
+factor = 2000 / dist
+x = startP.x + int((zielP.x - startP.x ) * factor)
+y = startP.y + int((zielP.y - startP.y) * factor)
+zwP = Point(x,y)
+print(distance(startP,zwP))
+print(zwP)
