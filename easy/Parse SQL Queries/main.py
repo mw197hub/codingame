@@ -19,9 +19,9 @@ sql='SELECT Suburb, Regionname FROM Housing WHERE Rooms = 4 ORDER BY CouncilArea
 table='Suburb Rooms CouncilArea Regionname'
 rowList=['Bulleen 3 Manningham EasternMetropolitan', 'Hawthorn 1 Boroondara SouthernMetropolitan', 'Hawthorn 3 Boroondara SouthernMetropolitan', 'Hawthorn 2 Boroondara SouthernMetropolitan', 'Hawthorn 4 Boroondara SouthernMetropolitan', 'Hawthorn 2 Boroondara SouthernMetropolitan', 'Healesville 3 YarraRanges NorthernVictoria', 'HeidelbergHeights 3 Banyule EasternMetropolitan', 'HeidelbergHeights 2 Banyule EasternMetropolitan', 'HeidelbergWest 3 Banyule EasternMetropolitan']
 
-#sql='SELECT * FROM Fishmonger WHERE Environment = FreshWater ORDER BY Weight DESC'  #test3
-#table='Name Environment Type Weight'
-#rowList=['Prawns FreshWater ShellFish 0.25', 'Beluga SaltWater Caviar 1', 'Salmon FreshWater Fish 15', 'SeaBream SaltWater Fish 0.5', 'BlueFinTuna SaltWater Fish 600', 'Salmon SaltWater Fish 5', 'Trout FreshWater Fish 2', 'Lobster SaltWater ShellFish 6']
+sql='SELECT * FROM Fishmonger WHERE Environment = FreshWater ORDER BY Weight DESC'  #test3
+table='Name Environment Type Weight'
+rowList=['Prawns FreshWater ShellFish 0.25', 'Beluga SaltWater Caviar 1', 'Salmon FreshWater Fish 15', 'SeaBream SaltWater Fish 0.5', 'BlueFinTuna SaltWater Fish 600', 'Salmon SaltWater Fish 5', 'Trout FreshWater Fish 2', 'Lobster SaltWater ShellFish 6']
 
 
 sqlList = sql.split(" ")
