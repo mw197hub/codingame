@@ -7,6 +7,10 @@ import numpy as np
 from matplotlib import path
 from math import atan2, degrees
 
+def winkelDreieck(a,b,c):
+    wertA = (a**2-b**2-c**2) / (-2 * b * c)
+    return round(math.degrees(math.acos(wertA)),2)
+
 def slope(p1, p2):
     if p2[0] - p1[0] == 0:
         return 0
@@ -58,3 +62,8 @@ pList = [[0, 0], [100, 0], [150, 50], [100, 100], [0, 100]]
 p = [150,0]
 #print(is_inside_polygon(pList,p))
 print(distance([73,17],[60,99]))
+
+# Winkel im Dreieck wenn alle Laengen bekannt sind
+print(winkelDreieck(5,3,4))
+print(winkelDreieck(4,3,5))
+print(winkelDreieck(3,4,5))
