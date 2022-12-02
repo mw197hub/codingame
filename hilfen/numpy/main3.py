@@ -12,7 +12,7 @@ y = np.linspace(-6, 6, 30)
 
 X, Y = np.meshgrid(x, y)
 Z = f(X, Y)
-print(Z)
+#print(Z)
 
 theta = np.linspace(0, 2 * np.pi, 30)
 w = np.linspace(-0.25, 0.25, 8)
