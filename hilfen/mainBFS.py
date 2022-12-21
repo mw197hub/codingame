@@ -6,8 +6,12 @@ def bfsMitWege(wege, queue, visited, graph, node):
       #  print(node)
         visited.append(node)
         for neighbour in graph[node]:
-            bfs(wege, queue, visited,graph,neighbour)
-        wege.append(visited[:])
+            bfsMitWege(wege, queue, visited,graph,neighbour)
+        if visited[-1] in wege:
+            if len(visited)-1 < len(wege[visited[-1]]):
+                wege[visited[-1]] = visited[:]
+        else:
+            wege[visited[-1]] = visited[:]
         visited.pop()
 
 
@@ -162,8 +166,8 @@ print('-------------------------------------------------------------------------
 ergebnis = bfs_shortest_path(graph2, '1-1', '8-8')
 print(ergebnis)
 
-wege = []; visited = []; queue = []
-bfs(wege, queue, visited, graph, '1-1'
+wege = {}; visited = []; queue = []
+bfsMitWege(wege, queue, visited, graph, '1-1')
 
 move = ""
 start = str(1) + "-" + str(1)
