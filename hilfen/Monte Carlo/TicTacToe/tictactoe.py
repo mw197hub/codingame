@@ -93,7 +93,7 @@ def play_game():
             break
         # You can train as you go, or only at the beginning.
         # Here, we train as we go, doing fifty rollouts each turn.
-        for _ in range(105):
+        for _ in range(7):
             tree.do_rollout(board)
         board = tree.choose(board)
         print(board.to_pretty_string())
