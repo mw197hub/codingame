@@ -130,18 +130,8 @@ class Cell:
         return ("{}#{} {} ({}) ({}) ({})".format(self.id,self.type,self.resource,self.nachbarList,self.distMy[0],self.distOpp[0]))
 ############################ 1  ##
 
-def setzeTypZiele(ziele,cellDict):
-    eggsTrue,kristallTrue=False,False
-    for z in ziele:
-        if cellDict[z].type == 1:
-            eggsTrue=True
-        if cellDict[z].type == 2:
-            kristallTrue=True
-    return eggsTrue,kristallTrue
-
 def getAntsCryEgg(cellDict):
-    myAnts,oppAnts,sumCry,sumEgg,maxOppAnts=0,0,0,0,0
-    optAnzDict={}
+    myAnts,oppAnts,sumCry,sumEgg=0,0,0,0
     for cId,cell in cellDict.items():
         if cell.type==1:
             sumEgg+=cell.resource
@@ -151,17 +141,11 @@ def getAntsCryEgg(cellDict):
             myAnts+=cell.myAnts
         if cell.oppAnts > 0:
             oppAnts+=cell.oppAnts
-        if cell.myAnts > 0 and cell.oppAnts > 0:
-            if cell.oppAnts > 0 and cell.myAnts > 0 and cell.oppAnts > maxOppAnts:
-                maxOppAnts = cell.oppAnts
-    for i in range(0,201):
-         optAnzDict[i] = 0 if i == 0 else  myAnts//i
-
     print("Summen: myA:{} oppA:{} summCry:{} sumEgg:{}".format(myAnts,oppAnts,sumCry,sumEgg),file=sys.stderr)
-    return myAnts,oppAnts,sumCry,sumEgg,optAnzDict,maxOppAnts
+    return myAnts,oppAnts,sumCry,sumEgg
 
 ####### A ##
-def setzeWeg(wegeOri,actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,ziele,ressourceDict,optAnzDict,maxOppAnts,xy,zieleXY):
+def setzeWeg(wegeOri,actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,cellLaenge,ziele,ressourceDict):
     wege = copy.deepcopy(wegeOri)
     if ziel == 20:
         a=0
@@ -170,17 +154,9 @@ def setzeWeg(wegeOri,actions,start,ziel,cellDict,myBaseList,oppBaseList,resource
         zWeg = reDict[z]
         if len(wege[0]) > len(zWeg[0]):
             wege = zWeg
-    wegWertBisher=optAnzDict[len(beaconList)]
-    wegWert = optAnzDict[len(wege[0])+len(beaconList)]
-    #if (wegWert < 2  or wegWert < maxOppAnts) and len(ziele) > 0:  #1
-    if (wegWert < 3) and len(ziele) > 0:
-        return 
-    zusatzZiel = 0
-    for i in range(wegWert,201):
-        if optAnzDict[i] == wegWert:
-            zusatzZiel+=1
 
-    ziele.append(ziel);zieleXY.append(xy)
+
+    ziele.append(ziel)
     wegX=[];nachbarPunkte=-1
     for weg in wege:
         n2Punkte=0
@@ -196,60 +172,61 @@ def setzeWeg(wegeOri,actions,start,ziel,cellDict,myBaseList,oppBaseList,resource
             wegX=weg;nachbarPunkte=n2Punkte
     for w in wegX:
         if not w in beaconList:
-            actions=setBeacon(actions,w,cellDict,ziele);beaconList.append(w)
+            actions=setBeacon(actions,w,cellDict,ziele);cellLaenge+=1;beaconList.append(w)
         for n in cellDict[w].nachbarList:
             if n > -1 and cellDict[n].type > 0 and cellDict[n].resource > 0:
-                if zusatzZiel == 0:
-                    break
                 if not n in beaconList:
                     if not n in ziele:
                         ziele.append(n)
-                        s1,z1=getXY(xy)
-                        zieleXY.append(setXY(s1,n))
-                    actions=setBeacon(actions,n,cellDict,ziele);beaconList.append(n)
-                    zusatzZiel-= 1
-                    
-    return 
+                    actions=setBeacon(actions,n,cellDict,ziele);cellLaenge+=1;beaconList.append(n)
+    return cellLaenge
 
-def getActions(cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,ressourceDict,bisherZiele):
-    myAnts,oppAnts,sumCry,sumEgg,optAnzDict,maxOppAnts=getAntsCryEgg(cellDict)
+def getActions(cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,ressourceDict):
+    myAnts,oppAnts,sumCry,sumEgg=getAntsCryEgg(cellDict)
     actions=[] # BEACON y z;LINE x y z
-    beaconList=[];ziele=[];eggsTrue=False;kristallTrue=False
-    zieleXY=[]
-  #  for xy in bisherZiele:  #2
-  #      start,ziel = getXY(xy);wege=myZielDict[xy]
-  #      if cellDict[ziel].resource > 0 and ziel not in ziele:
-  #          setzeWeg(myZielDict[xy],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,ziele,ressourceDict,optAnzDict,maxOppAnts,xy,zieleXY)
-  #          eggsTrue,kristallTrue=setzeTypZiele(ziele,cellDict)
+    cellLaenge=0;beaconList=[];ziele=[]
 
-
-    #Eier
-    if  sumCry > myAnts:
+    if len(ziele) <= 1 and myAnts < sumCry / 6:
         for myXY in sorted(myZielDict.items(), key=lambda kv: len(kv[1][0])):
-            weg=myXY[1];start,ziel = getXY(myXY[0]);oppLaenge=cellDict[ziel].distOpp[0]
-            if cellDict[ziel].resource > 0 and cellDict[ziel].type == 1 and ziel not in ziele:
-                setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,ziele,ressourceDict,optAnzDict,maxOppAnts,myXY[0],zieleXY)
-                eggsTrue,kristallTrue=setzeTypZiele(ziele,cellDict)
+            weg=myXY[1]
+            start,ziel = getXY(myXY[0]);oppLaenge=cellDict[ziel].distOpp[0]
+            if cellDict[ziel].resource > 0 and len(weg[0])-1 <= oppLaenge and cellDict[ziel].type == 1 and ziel not in ziele:
+                cellLaenge=setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,cellLaenge,ziele,ressourceDict)
+
+            if cellLaenge > 0 and ((myAnts / cellLaenge < 3 and runde <= 9) or (runde > 9 and myAnts / cellLaenge < 5)):
+                break
     print("Egg 1 Ziele:{}".format(ziele),file=sys.stderr)
-    # Kristall
-    for myXY in sorted(myZielDict.items(), key=lambda kv: len(kv[1][0])):
-        weg=myXY[1];start,ziel = getXY(myXY[0]);oppLaenge=cellDict[ziel].distOpp[0]
-        if cellDict[ziel].resource > 0 and cellDict[ziel].type == 2 and ziel not in ziele:            
-            setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,ziele,ressourceDict,optAnzDict,maxOppAnts,myXY[0],zieleXY)
-            eggsTrue,kristallTrue=setzeTypZiele(ziele,cellDict)
-    print("Kristall Ziele:{}".format(ziele),file=sys.stderr)
-    #Eier
-    if not eggsTrue and not kristallTrue:
+    if len(ziele) <= 1:
         for myXY in sorted(myZielDict.items(), key=lambda kv: len(kv[1][0])):
-            weg=myXY[1];start,ziel = getXY(myXY[0]);oppLaenge=cellDict[ziel].distOpp[0]
+            weg=myXY[1]
+            start,ziel = getXY(myXY[0]);oppLaenge=cellDict[ziel].distOpp[0]
+            if cellDict[ziel].resource > 0 and len(weg[0])-1 <= oppLaenge and cellDict[ziel].type == 2 and ziel not in ziele:
+                cellLaenge=setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,cellLaenge,ziele,ressourceDict)
+
+            if cellLaenge > 0 and ((myAnts / cellLaenge < 3 and runde <= 9) or (runde > 9 and myAnts / cellLaenge < 5)):
+                break
+    print("Cry 1 Ziele:{}".format(ziele),file=sys.stderr)
+    if len(ziele) <= 2 or myAnts//cellLaenge > 5:
+        for myXY in sorted(myZielDict.items(), key=lambda kv: len(kv[1])):
+            start,ziel = getXY(myXY[0]);weg=myXY[1]
+            if cellDict[ziel].resource > 0 and cellDict[ziel].type == 2 and ziel not in ziele:
+                cellLaenge=setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,cellLaenge,ziele,ressourceDict)
+
+            if cellLaenge > 0 and myAnts / cellLaenge < 5:
+                break
+    print("Cry 1 Ziele:{}".format(ziele),file=sys.stderr)       
+    if len(ziele) <= 1 or myAnts//cellLaenge > 4:
+        for myXY in sorted(myZielDict.items(), key=lambda kv: len(kv[1])):
+            start,ziel = getXY(myXY[0]);weg=myXY[1]
             if cellDict[ziel].resource > 0 and cellDict[ziel].type == 1 and ziel not in ziele:
-                setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,ziele,ressourceDict,optAnzDict,maxOppAnts,myXY[0],zieleXY)
-                eggsTrue,kristallTrue=setzeTypZiele(ziele,cellDict)
-        print("Eier 2 Ziele:{}".format(ziele),file=sys.stderr)
- 
+                cellLaenge=setzeWeg(myXY[1],actions,start,ziel,cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,beaconList,cellLaenge,ziele,ressourceDict)
+
+            if cellLaenge > 0 and myAnts / cellLaenge < 5:
+                break
+    print("Egg 2 Ziele:{}".format(ziele),file=sys.stderr)
 
     actions.append("MESSAGE Ziele:{}".format(ziele))
-    return actions,copy.deepcopy(zieleXY)
+    return actions
 
 ################################## 2 ##
 
@@ -260,9 +237,9 @@ initMap("input1",cellDict,myBaseList,oppBaseList)
 resourceList,myZielDict,oppZielDict,ressourceDict=getResourceDist(cellDict,myBaseList,oppBaseList)
 #print(cellDict[26])
 print(myZielDict)
-runde=0;actions=[];bisherZiele=['46-32','46-8','46-4','46-2']
+runde=0;actions=[]
 while True:
-    actions,bisherZiele = getActions(cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,ressourceDict,bisherZiele)
+    actions = getActions(cellDict,myBaseList,oppBaseList,resourceList,myZielDict,oppZielDict,ressourceDict)
     print(';'.join(actions) if len(actions) > 0 else 'WAIT')
 
     runde+=1
