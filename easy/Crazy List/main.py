@@ -7,6 +7,7 @@ validators=[[1,5,9,13,17],[3,24,171,1200,8403],[6,-7,84,-553]]
 
 erg=0
 for testcase in testcases:
+    print(testcase,file=sys.stderr)
     if testcase[0] == testcase[1]:
         erg=testcase[0]
     else:
@@ -21,4 +22,4 @@ for testcase in testcases:
 
     print(int(erg))
     if int(erg) == testcase[-1]:
-        print("richtig")
+        print("richtig",file=sys.stderr)
