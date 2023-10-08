@@ -1,0 +1,4 @@
+# https://ide.codingame.com/21609455?id=67159074dfed33eeaec99fa6e7420adaa0162c2
+
+SELECT Top 10 ag.name, count(mu.recruiterId) as SCORE from mutant mu, agent ag where mu.recruiterId = ag.agentId GROUP BY mu.recruiterId order by count(mu.RECRUITERID) DESC
+

@@ -1,0 +1,84 @@
+```sql
+WITH 
+good_students
+AS (
+    SELECT *
+    FROM student
+    WHERE avgGrade >= (SELECT MEDIAN(avgGrade) FROM student)
+),
+chemistry_suspects
+AS (
+    SELECT distinct studentId
+    FROM (
+        select roomId from room
+        where roomName = 'Chemistry supply room'
+    ) r
+    JOIN roomAccessHistory rah
+    ON (r.roomId = rah.roomId)
+    WHERE EXTRACT(day from 24*60*(exitedAt-enteredAt)) > 70
+),
+friday_classes
+AS (
+    SELECT classId
+    FROM 
+        schedule
+    WHERE 
+        day = 'Friday'
+        and hour = 15
+),
+recent_chats_with_7_good_students
+AS (
+    SELECT
+        chatId, studentId, name, height, bedroomId, classId
+    FROM (
+        SELECT 
+            scm.chatId, 
+            scm.studentId,
+            st.name,
+            st.height,
+            st.bedroomId,
+            st.classId,
+            COUNT(1) OVER (PARTITION BY scm.chatId order by scm.chatId) AS count_people,
+            SUM(CASE WHEN st.studentId IS NULL THEN 0 ELSE 1 END) OVER (PARTITION BY scm.chatId order by scm.chatId) AS count_good_students
+        FROM studentsChatsMap scm
+        JOIN (
+            SELECT chatId, createdAt from onlineChat where createdAt > TIMESTAMP '3961-05-12 15:00:00' - INTERVAL '7' DAY
+        ) oc
+        ON (scm.chatId = oc.chatId)
+        LEFT JOIN good_students st
+        ON (scm.studentId = st.studentId)
+    ) recent_chats
+    WHERE count_people = 7 AND count_good_students = 7
+),
+suspect_chats
+AS (
+    SELECT rc.chatId, rc.name, rc.bedroomId, 
+        SUM(LOCATE('m', LOWER(name)) > 0 AND LOCATE('w', LOWER(name)) > 0) OVER (PARTITION BY rc.chatId ORDER BY rc.chatId) as num_wm_names,
+        SUM(CASE WHEN cs.studentId IS NULL THEN 0 ELSE 1 END) OVER (PARTITION BY rc.chatId ORDER BY rc.chatId) as num_chemistry_suspects,
+        SUM(CASE WHEN rc.height >= 220 THEN 1 ELSE 0 END) OVER (PARTITION BY rc.chatId ORDER BY rc.chatId) as num_extremely_tall,
+        SUM(CASE WHEN fc.classId IS NULL THEN 1 ELSE 0 END) OVER (PARTITION BY rc.chatId ORDER BY rc.chatId) as num_no_class,
+        COUNT(1) OVER (PARTITION BY rc.chatId, rc.bedroomId ORDER BY rc.chatId, rc.bedroomId) as num_in_same_bedroom
+    FROM recent_chats_with_7_good_students rc
+    LEFT JOIN friday_classes fc
+    ON (rc.classId = fc.classId)
+    LEFT JOIN chemistry_suspects cs
+    ON (rc.studentId = cs.studentId)
+)
+
+
+select st.NAME
+from (
+    SELECT distinct(chatId) 
+    FROM suspect_chats
+    WHERE num_wm_names > 0
+    AND num_chemistry_suspects > 0
+    AND num_extremely_tall = 2
+    AND num_no_class >= 3
+    AND num_in_same_bedroom = 3
+    AND bedroomId IS NOT NULL
+) the_chat
+JOIN studentsChatsMap scm
+ON (the_chat.chatId = scm.chatId)
+JOIN student st
+ON (scm.studentId = st.studentId)
+```

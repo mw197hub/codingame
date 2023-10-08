@@ -1,0 +1,25 @@
+SELECT Top 10 ag.name, count(mu.recruiterId) as SCORE from mutant mu, agent ag where mu.recruiterId = ag.agentId GROUP BY mu.recruiterId order by count(mu.RECRUITERID) DESC
+
+
+
+7 Treffer
+
+after 3pm on may 12, 3961
+student					1.000
+	studentsChatsMap
+		onlineChat
+	class
+		schedule
+	room
+		schedule
+	roomAccessHistory
+
+
+gute Studenten:
+SELECT *
+    FROM student
+    WHERE avgGrade >= (SELECT MEDIAN(avgGrade) FROM student)  order by avgGrade DESC
+
+Chemie:
+select roomId from room
+        where roomName = 'Chemistry supply room'

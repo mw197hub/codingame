@@ -1,0 +1,7 @@
+drobor:
+here's how my solution worked:
+||you can determine whether you hit a finish if you change single move at a constant time
+for each move: 
+  try to replace it with every other possible move and figure if you could hit finish if there were no obstacles
+  simulate remaining path to the finish\\obstacle hit. If you hit obstacle remember whole path in HashSet as "leading to obstacle"||
+
