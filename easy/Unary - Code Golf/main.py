@@ -49,7 +49,6 @@ e,a="",""
 for t in "".join(x.zfill(7)for x in w): 
  if t!=a:
   e+=[' 00 ',' 0 '][int(t)];a=t
-  #e+=" 0 "if t=="1"else" 00 ";a=t
  e+="0"
 print(e[1:])
 
