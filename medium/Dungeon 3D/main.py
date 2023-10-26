@@ -49,7 +49,6 @@ lineList=[[['.', '.', '#'], ['.', '#', '#'], ['A', '#', '#']], [['#', '.', '#'],
 lineList=[[['A', '.', '.'], ['#', '#', '#'], ['.', '.', 'S']], [['.', '#', '.'], ['.', '#', '#'], ['#', '#', '.']]]
 
 
-erg=0
 start=[]
 ziel=[]
 
@@ -65,7 +64,6 @@ for z in range(len(lineList)):
 wege=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]
 graph=aufbauGraph(wege,lineList)
 #print(graph,file=sys.stderr)
-
 
 path = bfs_shortest_path(graph,start,ziel)
 print(path,file=sys.stderr)
