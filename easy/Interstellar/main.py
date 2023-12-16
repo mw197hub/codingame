@@ -12,7 +12,7 @@ def getFactor(wertI,wertJ,wertK):
         return wertI,wertJ,wertK
     mini=0
     for i in range(1,1000):
-        if wI==i or wJ == i or wK == i:
+        if abs(wI)==i or abs(wJ) == i or abs(wK) == i:
             mini=i;break
     for i in range(mini,1,-1):
         if (wI == 0 or wI % i == 0) and (wJ == 0 or wJ % i == 0) and (wK == 0 or wK % i == 0):
