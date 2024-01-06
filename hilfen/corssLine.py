@@ -80,3 +80,5 @@ y = startP.y + int((zielP.y - startP.y) * factor)
 zwP = Point(x,y)
 print(distance(startP,zwP))
 print(zwP)
+
+

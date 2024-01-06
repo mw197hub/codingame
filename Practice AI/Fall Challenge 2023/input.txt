@@ -1,0 +1,23 @@
+drone=id:0 my:0 x:1400 y:4300 em:0 bat:16 puffer:[5, 10] radar:[[4, 'BR'], [5, 'BR'], [6, 'BR'], [7, 'BR'], [8, 'BR'], [9, 'BR'], [12, 'BR'], [13, 'BR'], [14, 'BR'], [15, 'BR'], [16, 'BR'], [17, 'BR']]
+drone=id:1 my:1 x:9160 y:4394 em:0 bat:25 puffer:[4] radar:[]
+drone=id:2 my:0 x:6400 y:4300 em:0 bat:16 puffer:[4] radar:[[4, 'BR'], [5, 'BL'], [6, 'BL'], [7, 'BR'], [8, 'BL'], [9, 'BR'], [12, 'BL'], [13, 'BL'], [14, 'BL'], [15, 'BR'], [16, 'BL'], [17, 'BR']]
+drone=id:3 my:1 x:1470 y:3844 em:0 bat:30 puffer:[] radar:[]
+fisch=id:4 color:0 type:0 runde:7 x:8026 y:4661 moveX:-123 moveY:158
+fisch=id:5 color:1 type:0 runde:8 x:1571 y:5000 moveX:95 moveY:389
+fisch=id:6 color:0 type:1 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:7 color:1 type:1 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:8 color:0 type:2 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:9 color:1 type:2 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:10 color:2 type:0 runde:5 x:336 y:3526 moveX:-351 moveY:192
+fisch=id:11 color:3 type:0 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:12 color:2 type:1 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:13 color:3 type:1 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:14 color:2 type:2 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:15 color:3 type:2 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:16 color:-1 type:-1 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+fisch=id:17 color:-1 type:-1 runde:-1 x:-1 y:-1 moveX:-1 moveY:-1
+myScanList=[];enemyScanList=[];beforeScanList=[[0, 5], [0, 10], [2, 4], [1, 4]]
+puffer=3;anzahlFische=12;anzahlMonster=2;runde=8
+
+
+
