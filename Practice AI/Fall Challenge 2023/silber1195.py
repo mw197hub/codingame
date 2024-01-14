@@ -100,8 +100,28 @@ class Drone:
 
 ########################
 
-def inRange(p1,p2):
-    return (p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) <= 500 * 500
+def inRange(d1,u2,m1,m2):
+    if (d1[0] - u2[0]) * (d1[0] - u2[0]) + (d1[1] - u2[1]) * (d1[1] - u2[1]) <= 500 * 500:
+        return True
+    if m1==[0,0] and m2==[0,0]:
+        return False
+    x= u2[0];y=u2[1];ux=d1[0];uy=d1[1]
+    x2=x-ux;y2=y-uy;r2=500
+    vx2=m2[0]-m1[0];vy2=m2[1]-m1[1]
+    a=vx2*vx2+vy2*vy2
+    if a <= 0.0:
+        return False
+    b=2.0*(x2*vx2+y2*vy2)
+    c=x2*x2+y2*y2-r2*r2
+    delta=b*b-4.0*a*c
+    if delta < 0.0:
+        return False
+    t=(-b - math.sqrt(delta))/(2.0*a)
+    if t <= 0.0:
+        return False
+    if t > 1.0:
+        return False
+    return True
 
 def distance(p1,p2):
     return int(round(math.sqrt( ((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2) ),0))
@@ -174,38 +194,43 @@ def fischDrone(fischList,drone):
     return dList,problem
 
 def testeList600(drone,list600,fischList):
-    ergList=[];moveX,moveY,maxD=0,0,0
-    for i in range(len(list600)):
-        mov = list600[i]
-        movList=[]
-        movList.append(mov)
-        movList.append([mov[0]*-1,mov[1]])
-        movList.append([mov[0],mov[1]*-1])
-        movList.append([mov[0]*-1,mov[1]*-1])
-        for move in movList:
-            d = (distance([drone.x+move[0],drone.y+move[1]],[fischList[0][0]+fischList[0][2],fischList[0][1]+fischList[0][3]]))     
-            if d > 540:  
-                ergList.append([move,d])
-            if d > maxD:
-                moveX,moveY=move[0],move[1]
+    ergList=[];moveX,moveY,maxD,minD=0,0,0,9999
+    minX,minY=0,0
+    for fisch in fischList:
+        for i in range(len(list600)):
+            mov = list600[i]
+            movList=[]
+            movList.append(mov)
+            movList.append([mov[0]*-1,mov[1]])
+            movList.append([mov[0],mov[1]*-1])
+            movList.append([mov[0]*-1,mov[1]*-1])
+            for move in movList:
+                if not inRange([drone.x,drone.y],[fisch[0],fisch[1]],[move[0],move[1]],[fisch[2],fisch[3]]):
+                    d = (distance([drone.x+move[0],drone.y+move[1]],[fisch[0]+fisch[2],fisch[1]+fisch[3]]))     
+                    if d > 800:  
+                        ergList.append([move,d])
+                        dMin = abs((distance([move[0],move[1]],[drone.moveX,drone.moveY])))
+                        if dMin < minD:
+                            minX,minY=move[0],move[1];minD=dMin
+                    if d > maxD:
+                        moveX,moveY=move[0],move[1]
+    if minX != 0 and minY != 0:
+        return ergList,minX,minY
     return ergList,moveX,moveY
 
 def ausweichen(runde,drone,droneDict,fischDict,xyList,deepDict,moveDict,moveList,list600,list540,auftauchen):
-    fischList=[];ausweichen=False   # fischList  fX,fY,mfX,mfY,abstand:df,dfN,dNf,dNfN
+    fischList=[];ausweichen=False   # fischList  fX,fY,mfX,mfY
     for id,fisch in fischDict.items():
         if fisch.typ == -1 and fisch.runde == runde:
-            dist1 = distance([drone.x,drone.y],[fisch.x,fisch.y])
-            dist2 = distance([drone.x,drone.y],[fisch.x+fisch.moveX,fisch.y+fisch.moveY])
-            dist3 = distance([drone.x+drone.moveX,drone.y+drone.moveY],[fisch.x,fisch.y])
-            dist4 = distance([drone.x+drone.moveX,drone.y+drone.moveY],[fisch.x+fisch.moveX,fisch.y+fisch.moveY])
-            if dist1 <= 800 or dist2 <= 800 or dist3 <= 800 or dist4 <= 800:
+            if inRange([drone.x,drone.y],[fisch.x,fisch.y],[drone.moveX,drone.moveY],[fisch.moveX,fisch.moveY]):
                 ausweichen=True
-                fischList.append([fisch.x,fisch.y,fisch.moveX,fisch.moveY,dist1,dist2,dist3,dist4])
+                fischList.append([fisch.x,fisch.y,fisch.moveX,fisch.moveY])
     if ausweichen:
         drone.light=0
         drone.ausweichen=[runde,fischList[0][0]+fischList[0][2],fischList[0][1]+fischList[0][3]]
         if len(fischList) == 1:
             testList,drone.moveX,drone.moveY=testeList600(drone,list600,fischList)
+            #print(testList,file=sys.stderr)
             if len(testList) == 0:
                 dFisch=distance([0,0],[fischList[0][2],fischList[0][3]])+1
                 verh=600/dFisch
@@ -222,10 +247,10 @@ def ausweichen(runde,drone,droneDict,fischDict,xyList,deepDict,moveDict,moveList
                 d1 = distance([drone.ausweichen[1],drone.ausweichen[2]],[420,420])
                 d2 = distance([drone.ausweichen[1],drone.ausweichen[2]],[-420,420])
             
-            if d1 > d2:
-                drone.moveX,drone.moveY=420,-420
-            else:
-                drone.moveX,drone.moveY=-420,-420
+           #if d1 > d2:
+           #     drone.moveX,drone.moveY=420,-420
+           # else:
+           #     drone.moveX,drone.moveY=-420,-420
            # print("vorbei schwimmen",file=sys.stderr)
 
     return ausweichen
@@ -362,4 +387,6 @@ while True:
 
 
     #print(distance(f2,dN))
-
+print(distance([7238,9327],[6500,8984]))
+print(distance([7238,9327],[6500+260,8984-74]))
+print(distance([7238-420,9327-420],[6500+260,8984-74]))
