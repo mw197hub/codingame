@@ -35,9 +35,6 @@ def getDreiecke(triList):
             for x in range(min([x1,x2,x3]),max([x1,x2,x3])+1,1):
                 if is_inside_polygon([[y1,x1],[y2,x2],[y3,x3]],[y,x]):
                     wegList.append([y,x])
-
-
-
     return wegList
 
 
