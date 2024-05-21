@@ -1,0 +1,74 @@
+# https://www.codingame.com/ide/puzzle/codongame
+
+import sys,math
+
+rnaList=['AUGUAA', 'CAUGUAA', 'CCAUGUAA', 'CCAUGCCCUAA', 'CCAUGCCCUAAC', 'CCAUGCCCUAACC']
+rnaList=['AUGCCCAUGCCCUGACCCUGA', 'AUGCCCUGACCCAUGCCCUGA', 'AUGAUGAUGCCCUGACC', 'AUGAUAUGAUGA', 'AUGAUAACAUGAUAA', 'CAUGAUAACAUGAUGA', 'AUGCCCCCCCCCCCCUGA', 'CAUGCCCCCCCCCCCUGACUGA', 'CCAUGCCCCCCCCCCUGACCUGA', 'UGAUAAUGAAUGUGA', 'CUGAUAAUGAAUGUGA', 'CCUGAUAAUGAAUGUGA']
+rnaList=['AUGCCCUGACCCAUGCCCUGA']
+#rnaList=['CCUGAUAAUGAAUGUGA']
+
+
+#rnaList=['GAGUUCGUCAUGAACGAGGUGGAGAGGUAAAGCCGGGUUUUGGCACCUAUGGGGCAGAACAACGCGUAGUUUAAUUUGGUAGGCCGUAUGGGGAUAGUGGAGUAGUUUUUGGGGGGUCGGUUUAUGUACCAGGUGUAGACCUGGCGCUUUUAACCUAUGGUGCCGUAGAUAUUCUGA', 'CCGUUACGGAUGAACGAGGUGGAGAGGUAAGGAUUAAUAAUAUUGGAUAUGGGGCAGAACAACGCGUAGUAGCUGGCUUAUAAGUUCAUGCUGGAGACGUGAAUCACCGACCCGAGGGUCAUGUACCAGGUGUAAUAAGGCGUUACUGUUCACAUGGACCAGUGGAACUAAUAACGCGCG', 'AGCCGAGGUAUGAACGAGGUGGAGAGGUGAAGUUCGUGUGAAAAAGGAAUGGGGCAGAACAACGCGUAAAAUAAAGAAUUACGGGUUAUGAGGGUGAACUGAUCACUUCGUCCGUCUUGUAUGGCGAGGCAGGUGAACGACUGAUGAAAGAAGCCUUGUAACAUGGCGAACGACUAAAAGUGAACAGCAGCUUGGAUGGACGAGAGCGAGAGGACGUAAACCAGAUAGGCUGACCGGAUGUACCAGGUGUAGCUUGGGUCA', 'UUUUCGCGGAUGAACGAGGUGGAGAGGUAACGGCGGACCCAACGGGACAUGGGGCAGAACAACGCGUGAUCCUCAAUCGUCGCGGAAAUGAUGGCGAAGGAGUAGGUGAAUCUGACUCGAGCAAUGUACCAGGUGUAGUGUGGGAACCCGUAUAAAAUGUGCAGGUACUAAAGAUAUUAC', 'GCUCUCUUCAUGAACGAGGUGGAGAGGUAAAAACAAAGACGAGGCCAAAUGGGGCAGAACAACGCGUAGCCCCGGUAAGCCCCCCGGAUGAGCGCGUACUGAAUUUUUCCGCCACAACUUAUGGGGCAGCAGGACGUGUACGAGUAAAUCAUCAGC', 'GAAAUACCGAUGAACGAGGUGGAGAGGUGAACGUGGCGAGGAGUUGAUAUGGGGCAGAACAACGCGUAGACAGACGCGCAGAUUCGUAUGACGGAGCUGCUGUGAAGCGGUAUAAGAAGGGGUAUGGCGUGAACUCAUUGUUGAUCCAGGAUGCUGAUAGAGUGAUCCUCCACAGGUAGGUUAAUGGCGAACGACUGACCUUUGUUACGUCGUAGCAUGCACGUGAGGACGUGAGGCUGAAACCACAUCACAAUGUACCAGGUGUGAGUUCAUUUG']
+#rnaList=['GAGUUCGUCAUGAACGAGGUGGAGAGGUAAAGCCGGGUUUUGGCACCUAUGGGGCAGAACAACGCGUAGUUUAAUUUGGUAGGCCGUAUGGGGAUAGUGGAGUAGUUUUUGGGGGGUCGGUUUAUGUACCAGGUGUAGACCUGGCGCUUUUAACCUAUGGUGCCGUAGAUAUUCUGA']
+
+
+#codeDict={}
+#pfad='C:\\Users\\marku\\Python\\codingame\\easy\\Codongame\\input.txt'
+#f = open(pfad, "r")
+#for zeile in f:
+#  if zeile[0] == "#":
+#    codeDict[zeile[2:5]] = zeile[6:-1]
+#print(codeDict,file=sys.stderr)
+
+
+codeDict={'UUU': 'F', 'CUU': 'L', 'AUU': 'I', 'GUU': 'V', 'UUC': 'F', 'CUC': 'L', 'AUC': 'I', 'GUC': 'V', 'UUA': 'L', 'CUA': 'L', 'AUA': 'I', 'GUA': 'V', 'UUG': 'L', 'CUG': 'L', 'AUG': 'M', 'GUG': 'V', 'UCU': 'S', 'CCU': 'P', 'ACU': 'T', 'GCU': 'A', 'UCC': 'S', 'CCC': 'P', 'ACC': 'T', 'GCC': 'A', 'UCA': 'S', 'CCA': 'P', 'ACA': 'T', 'GCA': 'A', 'UCG': 'S', 'CCG': 'P', 'ACG': 'T', 'GCG': 'A', 'UAU': 'Y', 'CAU': 'H', 'AAU': 'N', 'GAU': 'D', 'UAC': 'Y', 'CAC': 'H', 'AAC': 'N', 'GAC': 'D', 'UAA': 'Stop', 'CAA': 'Q', 'AAA': 'K', 'GAA': 'E', 'UAG': 'Stop', 'CAG': 'Q', 'AAG': 'K', 'GAG': 'E', 'UGU': 'C', 'CGU': 'R', 'AGU': 'S', 'GGU': 'G', 'UGC': 'C', 'CGC': 'R', 'AGC': 'S', 'GGC': 'G', 'UGA': 'Stop', 'CGA': 'R', 'AGA': 'R', 'GGA': 'G', 'UGG': 'W', 'CGG': 'R', 'AGG': 'R', 'GGG': 'G'}
+
+start="AUG"
+
+
+for rna in rnaList:
+  ergList=[]
+
+  for i in range(3):
+    yStart=False
+    erg=""
+    zw=""
+    pos=i
+    while True:
+      if not yStart:
+        if rna[pos:pos+3] == start:        
+          yStart=True
+          zw+=codeDict[rna[pos:pos+3]]  
+        else:
+          erg+="-"      
+      else:
+        if rna[pos:pos+3] in codeDict:
+          if codeDict[rna[pos:pos+3]] == "Stop":
+            erg+=zw
+            zw=""
+            yStart=False
+          else:
+            zw+=codeDict[rna[pos:pos+3]]
+      pos+=3
+      if pos > len(rna):
+        if len(erg) == 0 and yStart:
+          erg = "M"
+        break
+
+    erg=erg.strip("-")
+    ausgabe=""
+    for i in range(len(erg)):
+      if erg[i] == "-":
+        if not ausgabe[-1] == "-":
+          ausgabe+="-"
+      else:
+        ausgabe+=erg[i]
+    ergList.append(ausgabe)
+
+  print(ergList,file=sys.stderr)
+  pos=0;lae=0
+  for i in range(3):
+    if len(ergList[i]) > 0 and len(ergList[i]) > lae:
+      pos = i; lae = len(ergList[i])
+  
+  print(ergList[pos])
