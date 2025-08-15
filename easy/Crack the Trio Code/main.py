@@ -32,7 +32,7 @@ l="8,16,26,27,42,53,65,69,81,83,88,99" #5
 
 
 
-maxWert=120
+
 zwList=[int(i) for i in l.split(",")]
 wList=[]
 for i in range(zwList[-1]+1):
