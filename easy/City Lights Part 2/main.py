@@ -61,4 +61,5 @@ for z in range(d):
             else:
                 ausgabe+=str(graph[setXY(x,y,z)])
         print(ausgabe)
-    print("")
+    if z < d-1:
+        print("")

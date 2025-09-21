@@ -1,6 +1,9 @@
 # https://www.codingame.com/ide/puzzle/find-the-winning-strategy
 
-import sys,math,string
+import sys,math
+
+
+
 from typing import List, Tuple
 
 def nim_sum(distances: List[int]) -> int:
@@ -29,11 +32,23 @@ def best_move(distances: List[int]) -> Tuple[int, int]:
             return (i, d - 1)
     return (-1, -1)
 
+def play_game(distances: List[int]):
+    distances = distances[:]  # Kopie
+    turn = 0  # 0 = du, 1 = Gegner
+    print("Start:", distances, "Nim-Summe:", nim_sum(distances))
+    while any(d > 0 for d in distances):
+        row, new_d = best_move(distances)
+        if row == -1:
+            print(f"{'Du' if turn==0 else 'Gegner'} kann nicht ziehen.")
+            break
+        print(f"{'Du' if turn==0 else 'Gegner'}: Reihe {row} {distances[row]}→{new_d} (Nim vorher {nim_sum(distances)})")
+        distances[row] = new_d
+        print("  Neues Feld:", distances, "Nim:", nim_sum(distances))
+        turn = 1 - turn
+    print("Spielende. Gewinner:", "Du" if turn == 1 else "Gegner")
 
-gameList=[[4, 6], [3, 7], [2, 8], [1, 9], [0, 10]]
-abstandList=[]
-for game in gameList:
-    abstandList.append(game[1]-game[0]-1)
-row, new_d = best_move(abstandList)
-pos = gameList[row][1]-1 - new_d
-print("{} {}".format(row,pos))
+
+# Beispiel: 3 Reihen mit Abständen
+if __name__ == "__main__":
+    start = [1, 3,5,7,9]  # Abstände in den Reihen
+    play_game(start)
