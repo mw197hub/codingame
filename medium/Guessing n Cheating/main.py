@@ -31,8 +31,6 @@ for i in range(len(inputList)):
         else:
             round = i + 1
             break
-   # if oGrenze - uGrenze <= 1:
-   #     round = i + 1;break
 
 if round > 0:
     print("Alice cheated in round {}".format(round))
