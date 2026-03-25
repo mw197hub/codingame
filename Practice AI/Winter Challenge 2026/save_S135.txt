@@ -1,0 +1,308 @@
+import sys,math,copy
+
+
+richtungList={'UP':['UP','RIGHT','LEFT'],'DOWN':['DOWN','RIGHT','LEFT'],'LEFT':['DOWN','LEFT','UP'],'RIGHT':['DOWN','UP','RIGHT']}
+
+def setXY(x,y):
+    return str(x)+"#"+str(y)
+def getXY(xy):
+    hList=xy.split("#")
+    return int(hList[0]),int(hList[1])
+def getRichtungWerte(richtung):
+    richtDict={'UP':[0,-1],"DOWN":[0,+1],"LEFT":[-1,0],"RIGHT":[1,0]}
+    return richtDict[richtung]
+def getRichtung(start,ziel):
+    x1,y1=getXY(start);x2,y2=getXY(ziel)
+    if x1 > x2:
+        return "LEFT"
+    if x1 < x2:
+        return "RIGHT"
+    if y1 > y2:
+        return "UP"
+    return "DOWN"
+def removeMyOppList(snakeDict,myDict,oppDict):
+    newDict={};sList=[]
+    for snake in snakeDict:
+        sList.append(snake)
+    for my,wert in myDict.items():
+        if my in sList:
+            newDict[my]=wert
+    myDict.clear();myDict = copy.deepcopy(newDict);newDict.clear()
+    for opp,wert in oppDict.items():
+        if opp in sList:
+            newDict[opp]=wert
+    oppDict.clear();oppDict = copy.deepcopy(newDict) 
+    return myDict,oppDict
+
+# Auto-generated code below aims at helping you parse
+# the standard input according to the problem statement.
+def setGraph(feldList,graph):
+    for y in range(len(rowList)):
+        for x in range(len(rowList[0])):
+            if rowList[y][x] == ".":
+                feldList.append(setXY(x,y))
+    for move in feldList:
+        x,y=getXY(move);zList=[]
+        if setXY(x+1,y) in feldList:
+            zList.append(setXY(x+1,y))
+        if setXY(x-1,y) in feldList:
+            zList.append(setXY(x-1,y))
+        if setXY(x,y+1) in feldList:
+            zList.append(setXY(x,y+1))
+        if setXY(x,y-1) in feldList:
+            zList.append(setXY(x,y-1))                                               
+        graph[move]=zList[:]    
+def removeMyOppList(snakeDict,myDict,oppDict):
+    newDict={};sList=[]
+    for snake in snakeDict:
+        sList.append(snake)
+    for my,wert in myDict.items():
+        if my in sList:
+            newDict[my]=wert
+    myDict.clear();myDict = copy.deepcopy(newDict);newDict.clear()
+    for opp,wert in oppDict.items():
+        if opp in sList:
+            newDict[opp]=wert
+    oppDict.clear();oppDict = copy.deepcopy(newDict) 
+    return myDict,oppDict   
+############################################# nur browser #################        
+###########################################################################
+
+
+def suchePath(graph, start, goal,snakeBody,richtung,moveList):
+    explored = [];queue = [[[start],snakeBody]];lauf=0 
+    suchList=copy.deepcopy(moveList);suchList.append(start)
+    if start == goal:
+        return [] # start ist ziel
+    while queue:
+        path,snBody = queue.pop(0);node = path[-1]
+        if node not in explored and node in suchList:
+            neighbours = graph[node]
+            for neighbour in neighbours:
+                new_path = list(path)
+                new_path.append(neighbour)
+                queue.append([new_path,snakeBody])
+                if neighbour == goal:
+                    return new_path
+            explored.append(node)
+    return [] # kein Weg zum Ziel
+
+def getDistanz(xyA,xyB):
+    x1,y1=getXY(xyA);x2,y2=getXY(xyB)
+    return abs(x1-x2)+abs(y1-y2)
+def getBodyGestreckt(snakeBody):
+    xS,yS=getXY(snakeBody[0])
+    for sB in snakeBody[1:]:
+        x,y=getXY(sB)
+        if not xS == x:
+            return False
+    return True
+def powerErreichbar(graph,powerList,moveList,snakeDict):
+    snakeL=[]
+    for sn,sL in snakeDict.items():
+        for s in sL:
+            snakeL.append(s)  
+    powerErDict={}
+    for power in powerList:
+        besucht=[];offen=[];abstand=0;startList=[]
+        offen.append(power)
+        while offen:
+            aktuell = offen.pop(0);besucht.append(aktuell);zList=[]
+            for neighbours in graph[aktuell]:  
+                if not neighbours in besucht and not neighbours in offen:                              
+                    x,y=getXY(neighbours)
+                    if setXY(x,y-1) in moveList or y-1 < 0:                        
+                        offen.append(neighbours)
+                    if not setXY(x,y+1) in moveList:
+                        startList.append(neighbours)          
+            abstand+=1     
+            if abstand > 30:
+                break
+        powerErDict[power] = copy.deepcopy(startList)
+    return powerErDict      
+
+def sucheRichtung(snake,start,richtung,graph,powerList,moveList,mRichtungen,snakeLen,snakeBody,bisherList,powerErDict,feldList,zielDict,keinZiel):
+    newRichtung="";power=False;posSave="";mWege =0;mrList=[];mrSave=""
+    for mR in mRichtungen:
+        xV,yV=getRichtungWerte(mR);x,y=getXY(start)
+        xN=x+xV;yN=y+yV;newPos=setXY(xN,yN)
+        if newPos in graph:
+            mWege=len(graph[newPos])
+        else:
+            mWege =0
+        if newPos in moveList and not power and mWege > 1:
+            newRichtung=mR;mrList.append(mR)
+            if newPos in powerList:
+                power=True;posSave=newPos;mrSave=mR
+
+    if not power and len(mrList) > 1:
+        if len(bisherList) > 3:
+            bList1=bisherList[-1];bList2=bisherList[-2];bList3=bisherList[-3] 
+            if bList1[1] == start and bList1[0] in mrList and bList2[1] == start and bList2[0] in mrList and bList3[1] == start and bList3[0] in mrList:
+                if bList1[0] == "UP" and not getBodyGestreckt(snakeBody):
+                    a=0
+                else:
+                    mrList.remove(bList1[0])
+                    zielList = zielDict[snake]
+                    if len(zielList) > 0:
+                        z = zielList.pop()
+                        #nList=keinZiel[snake];nList.append(z);keinZiel[snake]=nList
+                        #keinZiel[snake]=[z]
+
+        powerDist={};bodenList=[]
+        for sn in snakeBody:
+            xS,yS = getXY(sn)
+            if not setXY(xS,yS+1) in feldList:
+                bodenList.append(sn)
+
+        for powerXY in powerList:            
+            dist=getDistanz(powerXY,start)
+            if dist in powerDist:
+                pList=powerDist[dist];pList.append(powerXY)
+            else:
+                powerDist[dist]=[powerXY]
+        zaehler=0;lPath=99;ziel=''
+        for distPxy,powerL in sorted(powerDist.items()):
+            for powerXY in powerL:
+                if not powerXY in keinZiel[snake]:
+                #    errList= powerErDict[powerXY]
+                    distBoden=99
+                    for boden in bodenList:
+                        dBoden = getDistanz(powerXY,boden)
+                        if dBoden < distBoden:
+                            distBoden=dBoden
+                #   if len(snakeBody) >= distBoden:
+                    pathN = suchePath(graph,start,powerXY,snakeBody,richtung,moveList)
+                    if len(pathN) > 0 and len(pathN) < lPath:
+                        moveR = getRichtung(start,pathN[1])
+                        if moveR in mrList:
+                            newRichtung=moveR;posSave=pathN[1];power=True;lPath=len(pathN);zaehler=100
+                            ziel=powerXY
+                    zaehler+=1
+            if zaehler > 8:
+                break            
+            zList=zielDict[snake]
+            if not ziel in zList:                                
+                zList.append(ziel)
+        
+    else:
+        if len(mrSave) > 0:
+            newRichtung = mrSave                
+        else:
+            if len(mrList) > 0:
+                newRichtung=mrList[0]
+                xN,yN=getRichtungWerte(newRichtung);x,y=getXY(start)
+                xN=x+xN;yN=y+yN;newPos=setXY(xN,yN);posSave=newPos
+            else:
+                if getDistanz(start,snakeBody[-1]) == 1:
+                    newRichtung = getRichtung(start,snakeBody[-1])
+    if posSave in moveList:
+        moveList.remove(posSave)
+    return newRichtung
+
+def bewegung(runde,graph,myDict,oppDict,moveList,powerList,snakeDict,ergList,bisherBewegt,powerErDict,feldList,zielDict,keinZiel):
+    ergList.clear()
+
+    snakeSort = {k: v for k, v in sorted(snakeDict.items(), key=lambda item: len(item[1]),reverse=True)}
+    for snake, bodyList in snakeSort.items():
+        if snake in myDict:      
+            start=snakeDict[snake][0];richtung=myDict[snake]
+            if start in graph:
+                newRichtung=sucheRichtung(snake,start,richtung,graph,powerList,moveList,richtungList[richtung],len(snakeDict[snake]),snakeDict[snake],bisherBewegt[snake],powerErDict,feldList,zielDict,keinZiel)
+                if len(newRichtung) > 0:
+                    ergList.append([snake,newRichtung])
+                    myDict[snake]=newRichtung
+            else:
+                if richtung == "UP":
+                    x,y=getXY(start)
+                    if y < 0:
+                        newPos=setXY(x,y-1)
+                        if newPos in moveList:
+                            ergList.append([snake,"DOWN"])
+                            myDict[snake]="DOWN"
+                        else:
+                            if x > width /2:
+                                ergList.append([snake,"LEFT"])
+                                myDict[snake]="LEFT"
+                            else:
+                                ergList.append([snake,"RIGHT"])
+                                myDict[snake]="RIGHT"
+                    else:
+                        if x > 0:
+                            newPos=setXY(x-1,y)
+                            if newPos in moveList:
+                                ergList.append([snake,"LEFT"])
+                                myDict[snake]="LEFT"
+                        else:
+                            newPos=setXY(x+1,y)
+                            if newPos in moveList:
+                                ergList.append([snake,"RIGHT"])
+                                myDict[snake]="RIGHT"
+                else:
+                    ergList.append([snake,"UP"])
+                    myDict[snake]="UP"
+
+            bList=bisherBewegt[snake];bList.append([myDict[snake],start])
+            
+            
+
+
+
+###########################################################
+
+graph={};myDict={};oppDict={};feldList=[];ergList=[];bisherBewegt={};powerErDict={};zielDict={};keinZiel={}
+my_id = int(input());width = int(input());height = int(input())
+rowList=[]
+for i in range(height):
+    rowList.append(input())    
+#print("rowList={}".format(rowList),file=sys.stderr)
+setGraph(feldList,graph)
+snakebots_per_player = int(input())
+for i in range(snakebots_per_player):
+    nr=int(input())
+    myDict[nr] = "UP";bisherBewegt[nr]=[["UP",'0-0']];zielDict[nr]=[];keinZiel[nr]=[]
+for i in range(snakebots_per_player):
+    oppDict[int(input())] = "UP"
+
+# game loop
+runde=1
+while True:
+    moveList=copy.deepcopy(feldList)
+    powerList=[];snakeDict={}
+    power_source_count = int(input())
+    for i in range(power_source_count):
+        x, y = [int(j) for j in input().split()];powerList.append(setXY(x,y))        
+    snakebot_count = int(input())
+    for i in range(snakebot_count):
+        inputs = input().split()
+        snakebot_id = int(inputs[0]);body = inputs[1]
+        hList=body.split(":");zList=[]
+        for h in hList:
+            aList=h.split(",");zList.append(setXY(int(aList[0]),int(aList[1])))
+        snakeDict[snakebot_id]=zList[:]
+        for z in zList:
+            if z in moveList:
+                moveList.remove(z)
+    myDict,oppDict = removeMyOppList(snakeDict,myDict,oppDict) 
+  #  if runde == 1:
+  #      powerErDict=powerErreichbar(graph,powerList,moveList,snakeDict)
+
+    print("rowList={}".format(rowList),file=sys.stderr)
+    print("my_id={};width={};height={};myList={};oppList={};zielDict={};keinZiel={}".format(my_id,width,height,myDict,oppDict,zielDict,keinZiel),file=sys.stderr)
+    print("powerList={}".format(powerList),file=sys.stderr);print("snakeDict={}".format(snakeDict),file=sys.stderr);print("bisherBewegt={}".format(bisherBewegt),file=sys.stderr)
+    print("runde={}".format(runde),file=sys.stderr)
+
+    # Write an action using print
+    # To debug: print("Debug messages...", file=sys.stderr, flush=True)
+    bewegung(runde,graph,myDict,oppDict,moveList,powerList,snakeDict,ergList,bisherBewegt,powerErDict,feldList,zielDict,keinZiel)
+    if len(ergList) == 0:
+        print("WAIT")
+    else:
+        ausgabe=""
+        for erg in ergList:
+            ausgabe+=str(erg[0]) +" "+erg[1]+";"
+        print(ausgabe[:-1])
+    runde+=1
+    for nr,nrList in bisherBewegt.items():
+        if len(nrList) > 4:
+            nrList.pop(0)

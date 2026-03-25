@@ -1,0 +1,59 @@
+from collections import deque
+
+def get_gravity_neighbors(pos, body, obstacles, grid_size):
+    x, y = pos
+    w, h = grid_size
+    neighbors = []
+
+    # Hilfsfunktion: Ist ein Feld blockiert? (Körper oder Hindernis)
+    def is_blocked(p):
+        return p in body or p in obstacles or not (0 <= p[0] < w and 0 <= p[1] < h)
+
+    # 1. FALLEN: Wenn unter der Schlange leer ist, MUSS sie fallen (Schwerkraft)
+    if not is_blocked((x, y + 1)):
+        curr_y = y
+        while not is_blocked((x, curr_y + 1)):
+            curr_y += 1
+        return [(x, curr_y)]  # Nur das Landefeld ist ein gültiger Nachbar
+
+    # 2. BEWEGUNG/KLETTERN: Wenn sie auf festem Boden steht
+    for dx in [-1, 1]:
+        nx = x + dx
+        # Seitwärts bewegen
+        if not is_blocked((nx, y)):
+            neighbors.append((nx, y))
+        # KLETTERN: Wenn seitlich blockiert (Vorsprung), aber oben frei
+        elif not is_blocked((nx, y - 1)) and not is_blocked((x, y - 1)):
+            neighbors.append((nx, y - 1))
+            
+    return neighbors
+
+def get_advanced_path(start, goal, body, obstacles, grid_size, flee=False):
+    queue = deque([[start]])
+    visited = {start}
+    furthest_node = start
+    max_dist = 0
+
+    while queue:
+        path = queue.popleft()
+        curr = path[-1]
+
+        # Distanz zum Ziel für "Flucht"-Modus tracken
+        dist = abs(curr[0] - goal[0]) + abs(curr[1] - goal[1])
+        if dist > max_dist:
+            max_dist = dist
+            furthest_node = curr
+
+        if not flee and curr == goal:
+            return path
+
+        for neighbor in get_gravity_neighbors(curr, body, obstacles, grid_size):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(path + [neighbor])
+
+    # Wenn Flucht gewünscht oder kein Weg zum Futter: Gehe zum weitest entfernten Punkt
+    if flee or (not flee):
+        # Hier müsste man die BFS nochmal starten, um den Pfad zum 'furthest_node' zu bekommen
+        return "Pfad zum Fluchtpunkt berechnen" 
+    return None
