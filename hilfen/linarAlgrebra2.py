@@ -3,6 +3,28 @@ import math
 from math import atan2, degrees
 from math import acos, sqrt, pi
 
+# Schnittpunkt zweier Linien
+
+def get_intersection(l1, l2):
+    x1, y1, x2, y2 = l1
+    x3, y3, x4, y4 = l2
+    
+    # Nenner der Determinante (Prüfung auf Parallelität/Identität)
+    denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    
+    if denom == 0:
+        return None # Linien sind parallel oder identisch
+    
+    # Formel für den Schnittpunkt zweier Geraden
+    intersect_x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denom
+    intersect_y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denom
+    
+    # Runden auf 3 Dezimalstellen zur Vermeidung von Floating-Point-Ungenauigkeiten
+    return (round(float(intersect_x), 3), round(float(intersect_y), 3))
+
+
+
+
 def length(v):
     return sqrt(v[0]**2+v[1]**2)
 def dot_product(v,w):
